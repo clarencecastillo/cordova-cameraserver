@@ -93,14 +93,16 @@ public final class CameraManager {
 	}
 
 	public void openDriver() throws IOException {
-		
+
+		int selectedCameraId = 1;
 		if (camera == null) {
 			if (DEBUG) Log.i(TAG, "Camera opening...");
-			camera = Camera.open();
+			camera = Camera.open(selectedCameraId);
 			if (camera == null) {
 				if (DEBUG) Log.i(TAG, "First camera open failed");
-				camera = Camera.open(0);
-				
+				selectedCameraId = 0;
+				camera = Camera.open(selectedCameraId);
+
 				if (camera == null){
 					if (DEBUG) Log.i(TAG, "Second camera open failed");
 					throw new IOException();
@@ -112,9 +114,9 @@ public final class CameraManager {
 			camera.setPreviewDisplay(null);
 			
 			if (android.os.Build.VERSION.SDK_INT >= 9) {
-				setCameraDisplayOrientation(0, camera);
-			} 			
-									
+				setCameraDisplayOrientation(selectedCameraId, camera);
+			}
+
 			if (surfaceTexture != null){
 				camera.setPreviewTexture(surfaceTexture);
 				if (DEBUG) Log.i(TAG, "Set camera current texture");
