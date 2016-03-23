@@ -39,15 +39,15 @@ public final class CameraManager {
 
 	public static int mDesiredWidth = 1280;
 	public static int mDesiredHeight = 720;
-	
-	public static boolean DEBUG = true; 
-	public static String TAG = "CameraManager";	
+
+	public static boolean DEBUG = true;
+	public static String TAG = "CameraManager";
 
 	public static void setDesiredPreviewSize(int width, int height) {
 		mDesiredWidth = width;
 		mDesiredHeight = height;
 	}
-	
+
 	public Point getMaxResolution() {
 
 		if (camera != null)
@@ -55,7 +55,7 @@ public final class CameraManager {
 		else
 			return null;
 	}
-	
+
 	public Point getNormalResolution(Point normalRes) {
 
 		if (camera != null)
@@ -63,7 +63,7 @@ public final class CameraManager {
 		else
 			return null;
 	}
-	
+
 	public final PreviewCallback previewCallback;
 
 	public static void init(Context context) {
@@ -83,12 +83,12 @@ public final class CameraManager {
 	private CameraManager(Context context) {
 
 		Log.i(TAG, "Creating instance of CameraManager...");
-		
+
 		this.surfaceTexture = new SurfaceTexture(10);
-		
+
 		this.context = context;
 		this.configManager = new CameraConfigurationManager(context);
-				
+
 		previewCallback = new PreviewCallback(configManager, this);
 	}
 
@@ -108,11 +108,11 @@ public final class CameraManager {
 					throw new IOException();
 				}
 			}
-			
+
 			if (DEBUG) Log.i(TAG, "Camera open success");
-						
+
 			camera.setPreviewDisplay(null);
-			
+
 			if (android.os.Build.VERSION.SDK_INT >= 9) {
 				setCameraDisplayOrientation(selectedCameraId, camera);
 			}
@@ -121,7 +121,7 @@ public final class CameraManager {
 				camera.setPreviewTexture(surfaceTexture);
 				if (DEBUG) Log.i(TAG, "Set camera current texture");
 			} else {
-				
+
 				if (DEBUG) Log.i(TAG, "Camera texture is NULL");
 			}
 
@@ -132,7 +132,7 @@ public final class CameraManager {
 			}
 			configManager.setDesiredCameraParameters(camera);
 			if (DEBUG) Log.i(TAG, "Camera set desired parameters");
-					
+
 
 		} else {
 			if (DEBUG) Log.i(TAG, "Camera already opened");
@@ -148,41 +148,41 @@ public final class CameraManager {
 		if (!cp.isZoomSupported()){
 			return -1;
 		}
-		
+
 		List<Integer> zoomRatios =  cp.getZoomRatios();
-		
+
 		return zoomRatios.get(zoomRatios.size()-1);
 	}
-	
+
 	public void setZoom(int zoom){
-		
+
 		if (camera == null)
 			return;
 
 		final Parameters cp = camera.getParameters();
-		
+
 		int minDist = 100000;
 		int bestIndex = 0;
-		
+
 		if (zoom == -1) {
 			int zoomIndex = cp.getZoom() - 1;
-			
+
 			if (zoomIndex >= 0){
 				zoom = cp.getZoomRatios().get(zoomIndex);
 			}
 		}
-		
+
 		List<Integer> zoomRatios =  cp.getZoomRatios();
-		
+
 		for (int i = 0; i < zoomRatios.size(); i++){
 			int z = zoomRatios.get(i);
-			
+
 			if (Math.abs(z - zoom) < minDist){
 				minDist = Math.abs(z - zoom);
 				bestIndex = i;
 			}
 		}
-		
+
 		final int fBestIndex = bestIndex;
 
 		cp.setZoom(fBestIndex);
@@ -214,15 +214,15 @@ public final class CameraManager {
 			List<String> flashModes = cp.getSupportedFlashModes();
 
 			if (flashModes != null && flashModes.contains(Parameters.FLASH_MODE_TORCH)) {
-				//camera.cancelAutoFocus();				
-								
+				//camera.cancelAutoFocus();
+
 				new Handler().postDelayed(new Runnable() {
-					
+
 					@Override
 					public void run() {
 						if (camera != null){
 							Log.w("CameraManager", "Setting torch to " + enabled);
-							
+
 							if (enabled)
 							{
 								cp.setFlashMode(Parameters.FLASH_MODE_TORCH);
@@ -231,10 +231,10 @@ public final class CameraManager {
 							{
 								cp.setFlashMode(Parameters.FLASH_MODE_OFF);
 							}
-							
+
 							camera.setParameters(cp);
 						}
-						
+
 					}
 				}, 300);
 			}
@@ -242,59 +242,59 @@ public final class CameraManager {
 
 		}
 	}
-	
+
 	public float[] getExposureCompensationRange(){
-		
+
 		if (camera == null)
 			return null;
 
 		try{
-		
+
 			Parameters cp = camera.getParameters();
-			
+
 			float ecStep = cp.getExposureCompensationStep();
 			float minEC = cp.getMinExposureCompensation();
 			float maxEC = cp.getMaxExposureCompensation();
-			
+
 			float[] res = new float[3];
 			res[0] = minEC;
 			res[1] = maxEC;
 			res[2] = ecStep;
-			
+
 			return res;
-			
+
 		} catch (Exception e) {
-			
+
 			return null;
 		}
 	}
-	
+
 	public void setExposureCompensation(float value) {
 
 		if (camera == null)
 			return;
 
 		try{
-		
+
 			Parameters cp = camera.getParameters();
-			
-			//int currentEC = cp.getExposureCompensation();			
+
+			//int currentEC = cp.getExposureCompensation();
 			//float ecStep = cp.getExposureCompensationStep();
-			
+
 			float minEC = cp.getMinExposureCompensation();
 			float maxEC = cp.getMaxExposureCompensation();
-			
+
 			if (value > maxEC)
 				value = maxEC;
 			if (value < minEC)
 				value = minEC;
-			
+
 			cp.setExposureCompensation((int) value);
-			
+
 			camera.setParameters(cp);
-			
+
 			//Log.d("exposure compensation", String.valueOf(value));
-			
+
 		} catch (Exception e) {
 			//Log.d("exposure compensation", "failed to set");
 		}
@@ -302,71 +302,71 @@ public final class CameraManager {
 
 	public void closeDriver() {
 
-		if (camera != null) {	
+		if (camera != null) {
 
 			camera.release();
 			camera = null;
 		}
 	}
-	
+
 	public void startPreview() {
 		if (camera != null && !previewing) {
-			
+
 			previewing = true;
-			
+
 			if (DEBUG) Log.i(TAG, "Starting preview");
-						
+
 			camera.startPreview();
 
 			int targetRotation = 0;
-			
+
 			if (android.os.Build.VERSION.SDK_INT >= 9) {
 				targetRotation = getDisplayOrientation(0);
-			} 		
-			
+			}
+
 			previewCallback.setRotation(targetRotation);
-			
-			if (DEBUG) Log.i(TAG, "Setting Standard Callback");			
+
+			if (DEBUG) Log.i(TAG, "Setting Standard Callback");
 			camera.setPreviewCallback(previewCallback);
-						
+
 		}
 	}
-	
+
 	public void stopPreview() {
 		if (camera != null && previewing) {
 
 			if (DEBUG) Log.i(TAG, "Stopping preview");
-					
+
 			camera.setPreviewCallback(null);
-			
+
 			camera.stopPreview();
-			
+
 			previewing = false;
 		}
 	}
-		
-	@TargetApi(Build.VERSION_CODES.GINGERBREAD)	
+
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	public int getDisplayOrientation(int cameraId) {
-		
+
 		 android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
 	     android.hardware.Camera.getCameraInfo(cameraId, info);
-	    
-	     Log.d(TAG, "Camera Orientation: " + info.orientation);		
-		
+
+	     Log.d(TAG, "Camera Orientation: " + info.orientation);
+
 	     Display d = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
 	     int rotation = d.getRotation();
-	     
-	     Log.d(TAG, "Display Rotation: " + rotation);			
-	     	     
+
+	     Log.d(TAG, "Display Rotation: " + rotation);
+
 	     int degrees = 0;
 	     switch (rotation) {
 	         case Surface.ROTATION_0: degrees = 0; break;
 	         case Surface.ROTATION_90: degrees = 90; break;
 	         case Surface.ROTATION_180: degrees = 180; break;
 	         case Surface.ROTATION_270: degrees = 270; break;
-	     }		
-	     	     	     
+	     }
+
 	     int result;
 	     if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
 	         result = (info.orientation + degrees) % 360;
@@ -374,25 +374,25 @@ public final class CameraManager {
 	     } else {  // back-facing
 	         result = (info.orientation - degrees + 360) % 360;
 	     }
-	     
-	     Log.d(TAG, "Image must be rotated to: " + result);				     
-	     
+
+	     Log.d(TAG, "Image must be rotated to: " + result);
+
 	     return result;
 	 }
-	
+
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	public int setCameraDisplayOrientation(int cameraId, android.hardware.Camera camera) {
-	     		     	     
+
 	     int result = getDisplayOrientation(cameraId);
-	     	     	     
-	     // Doesn't work for previewCallback, only displayed output :s     
-	     	     	    
+
+	     // Doesn't work for previewCallback, only displayed output :s
+
 	     camera.setDisplayOrientation(result);
-	     
+
 	     //Camera.Parameters parameters = camera.getParameters();
 		 //parameters.set("orientation", "portrait");
-		 //parameters.setRotation(result);					 
-	     	     
+		 //parameters.setRotation(result);
+
 	     return result;
 	 }
 
@@ -476,7 +476,7 @@ final class CameraConfigurationManager {
 			}
 		} catch (Exception e){
 		}
-		
+
 		try {
 			String vs = parameters.get("video-stabilization-ocr");
 			if (vs != null) {
@@ -510,17 +510,17 @@ final class CameraConfigurationManager {
 		}
 
 		//String focusMode = parameters.getFocusMode();
-		
+
 		try{
 			parameters.setFocusMode(Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
 			camera.setParameters(parameters);
 		} catch (Exception e){
-			
+
 			try{
 				parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
 				camera.setParameters(parameters);
 			} catch (Exception e2){
-						
+
 			}
 		}
 
@@ -543,7 +543,7 @@ final class CameraConfigurationManager {
 	String getPreviewFormatString() {
 		return previewFormatString;
 	}
-	
+
 	public static Point getMaxResolution(Camera.Parameters parameters) {
 
 		List<Size> sizes = parameters.getSupportedPreviewSizes();
@@ -552,7 +552,7 @@ final class CameraConfigurationManager {
 		int maxSize = 0;
 
 		for (int i = 0; i < sizes.size(); i++) {
-			int size = sizes.get(i).width * sizes.get(i).height; 
+			int size = sizes.get(i).width * sizes.get(i).height;
 			if (size > maxSize) {
 				maxSize = size;
 				maxIndex = i;
@@ -565,7 +565,7 @@ final class CameraConfigurationManager {
 	public static Point getCameraResolution(Camera.Parameters parameters, Point desiredResolution) {
 
 		String previewSizeValueString = parameters.get("preview-size-values");
-		
+
 		if (previewSizeValueString == null) {
 			previewSizeValueString = parameters.get("preview-size-value");
 		}
@@ -582,35 +582,35 @@ final class CameraConfigurationManager {
 
 		int minDif = 99999;
 		int minIndex = -1;
-		
+
 		float screenAR = ((float)CameraConfigurationManager.screenResolution.x) / CameraConfigurationManager.screenResolution.y;
 
 		for (int i = 0; i < sizes.size(); i++) {
-			
+
 			//float resAR = ((float)sizes.get(i).width) / sizes.get(i).height;
-			
+
 			int dif = Math.abs(sizes.get(i).width - desiredResolution.x) + Math.abs(sizes.get(i).height - desiredResolution.y);
-			
+
 			//int dif = Math.abs((sizes.get(i).width * sizes.get(i).height) - (CameraManager.mDesiredWidth * CameraManager.mDesiredHeight));
-			
+
 			if (dif < minDif) {
 				minDif = dif;
 				minIndex = i;
 			}
 		}
-		
+
 		float desiredTotalSize = desiredResolution.x * desiredResolution.y;
 		float bestARdifference = 100;
-		
-		
+
+
 		for (int i = 0; i < sizes.size(); i++) {
-			
+
 			float resAR = ((float)sizes.get(i).width) / sizes.get(i).height;
-			
+
 			float totalSize = sizes.get(i).width * sizes.get(i).height;
-			
+
 			float difference;
-			
+
 			if (totalSize >= desiredTotalSize){
 				difference = totalSize / desiredTotalSize;
 			} else {
@@ -618,16 +618,16 @@ final class CameraConfigurationManager {
 			}
 
 			float ARdifference;
-			
+
 			if (resAR >= screenAR){
 				ARdifference = resAR / screenAR;
 			} else {
 				ARdifference = screenAR / resAR;
 			}
-			
+
 			if (difference < 1.1 && ARdifference < bestARdifference){
 				bestARdifference = ARdifference;
-				minIndex = i;		
+				minIndex = i;
 			}
 		}
 
@@ -651,7 +651,7 @@ final class PreviewCallback implements Camera.PreviewCallback {
 	private CameraManager parentManager;
 	private int imageRotation = 0;
 	private byte[] lastImage;
-	
+
 	private boolean newImageNeeded;
 	private long lastImageRequest = 0;
 
@@ -660,18 +660,18 @@ final class PreviewCallback implements Camera.PreviewCallback {
 		this.configManager = configManager;
 		this.parentManager = parent;
 		this.imageRotation = 0;
-		
+
 		///this.outputStream = new ByteArrayOutputStream();
-		this.newImageNeeded = true;		
+		this.newImageNeeded = true;
 	}
-	
+
 	public boolean setRotation(int rotation)
 	{
 		this.imageRotation = rotation;
-		
+
 		return true;
 	}
-	
+
 	public byte[] getLastFrame()
 	{
 		newImageNeeded = true;
@@ -717,8 +717,8 @@ final class PreviewCallback implements Camera.PreviewCallback {
 		try {
 		   Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0,data.length);
 		   bitmap.compress(Bitmap.CompressFormat.JPEG, 75, outputStream);
-		} 
-		catch (Exception e) 
+		}
+		catch (Exception e)
 		{
 		   e.printStackTrace();
 		}
@@ -756,13 +756,13 @@ final class PreviewCallback implements Camera.PreviewCallback {
 			{
 				lastImage = outputStream.toByteArray();
 			}
-			
+
 			//Log.i("onPreviewFrame", "New lastImage has been set >> " + String.valueOf(lastImage.length));
-		
+
 		} catch (Exception e) {
 			Log.e("onPreviewFrame", "Exception >> " + e.getMessage());
 		}
-        		  		
+
 		updateFps();
 	}
 
@@ -782,7 +782,7 @@ final class PreviewCallback implements Camera.PreviewCallback {
 		}
 		fpscount++;
 	}
-	
+
 	static public void decodeYUV420SP(int[] rgb, byte[] yuv420sp, int width, int height) {
 	    final int frameSize = width * height;
 
