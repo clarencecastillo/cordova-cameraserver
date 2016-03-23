@@ -96,7 +96,7 @@ public final class CameraManager {
 		
 		if (camera == null) {
 			if (DEBUG) Log.i(TAG, "Camera opening...");
-			camera = Camera.open();
+			camera = Camera.open(1);
 			if (camera == null) {
 				if (DEBUG) Log.i(TAG, "First camera open failed");
 				camera = Camera.open(0);
