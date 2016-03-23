@@ -33,7 +33,7 @@ public class CameraServer extends CordovaPlugin {
 
     /** Common tag used for logging statements. */
     private static final String LOGTAG = "CameraServer";
-    
+
     /** Cordova Actions. */
     private static final String ACTION_START_SERVER = "startServer";
     private static final String ACTION_STOP_SERVER = "stopServer";
@@ -65,7 +65,7 @@ public class CameraServer extends CordovaPlugin {
 
 
     private String www_root = "";
-	private int port = 8080;	
+	private int port = 8080;
 	private boolean localhost_only = false;
 
     private String json_info = "";
@@ -73,7 +73,7 @@ public class CameraServer extends CordovaPlugin {
 	private String localPath = "";
 	private WebServer server = null;
 	private String	url = "";
-	
+
 	private int brightness = 50;
 	private boolean torchEnabled = false;
 
@@ -82,10 +82,10 @@ public class CameraServer extends CordovaPlugin {
         PluginResult result = null;
         if (ACTION_START_SERVER.equals(action)) {
             result = startServer(inputs, callbackContext);
-            
+
         } else if (ACTION_STOP_SERVER.equals(action)) {
             result = stopServer(inputs, callbackContext);
-            
+
         } else if (ACTION_GET_URL.equals(action)) {
             result = getURL(inputs, callbackContext);
 
@@ -94,7 +94,7 @@ public class CameraServer extends CordovaPlugin {
 
         } else if (ACTION_GET_LOCAL_PATH.equals(action)) {
             result = getLocalPath(inputs, callbackContext);
-            
+
         } else if (ACTION_GET_NUM_REQUESTS.equals(action)) {
             result = getNumRequests(inputs, callbackContext);
 
@@ -132,12 +132,12 @@ public class CameraServer extends CordovaPlugin {
             Log.d(LOGTAG, String.format("Invalid action passed: %s", action));
             result = new PluginResult(Status.INVALID_ACTION);
         }
-        
+
         if(result != null) callbackContext.sendPluginResult( result );
-        
+
         return true;
     }
-    
+
     private String __getLocalIpAddress() {
     	try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
@@ -154,7 +154,7 @@ public class CameraServer extends CordovaPlugin {
         } catch (SocketException ex) {
             Log.e(LOGTAG, ex.toString());
         }
-    	
+
 		return "127.0.0.1";
     }
 
@@ -163,7 +163,7 @@ public class CameraServer extends CordovaPlugin {
 
         JSONObject options = inputs.optJSONObject(0);
         if(options == null) return null;
-        
+
         www_root = options.optString(OPT_WWW_ROOT);
         port = options.optInt(OPT_PORT, 8080);
         localhost_only = options.optBoolean(OPT_LOCALHOST_ONLY, false);
@@ -180,7 +180,7 @@ public class CameraServer extends CordovaPlugin {
         		localPath += www_root;
         	}
         }
-        
+
         final CallbackContext delayCallback = callbackContext;
         cordova.getActivity().runOnUiThread(new Runnable(){
 			@Override
@@ -190,12 +190,12 @@ public class CameraServer extends CordovaPlugin {
 					delayCallback.error( errmsg );
 				} else {
 			        url = "http://" + __getLocalIpAddress() + ":" + port;
-			        
+
 	                delayCallback.success( url );
 				}
             }
         });
-        
+
         return null;
     }
 
@@ -215,23 +215,23 @@ public class CameraServer extends CordovaPlugin {
 
             return null;
         }
-    
+
     private String __startServer() {
     	String errmsg = "";
     	try {
     		AndroidFile f = new AndroidFile(localPath);
-    		
+
 	        Context ctx = cordova.getActivity().getApplicationContext();
 			AssetManager am = ctx.getResources().getAssets();
     		f.setAssetManager( am );
-    		
+
     		if(localhost_only) {
     			InetSocketAddress localAddr = InetSocketAddress.createUnresolved("127.0.0.1", port);
     			server = new WebServer(localAddr, f);
     		} else {
     			server = new WebServer(port, f);
     		}
-    			        
+
 	        Log.w(LOGTAG, "Setting jsonInfo to: " + json_info);
 
 	        server.SetJsonInfo(json_info);
@@ -269,10 +269,10 @@ public class CameraServer extends CordovaPlugin {
 
         return null;
     }
-    
+
    private PluginResult getURL(JSONArray inputs, CallbackContext callbackContext) {
 		Log.w(LOGTAG, "getURL");
-		
+
     	callbackContext.success( this.url );
         return null;
     }
@@ -286,25 +286,25 @@ public class CameraServer extends CordovaPlugin {
 
     private PluginResult getLocalPath(JSONArray inputs, CallbackContext callbackContext) {
 		Log.w(LOGTAG, "getLocalPath");
-		
+
     	callbackContext.success( this.localPath );
         return null;
     }
 
     private PluginResult getNumRequests(JSONArray inputs, CallbackContext callbackContext) {
 		Log.w(LOGTAG, "getNumRequests");
-		
+
 		int nReq = 0;
-		
+
 		if (server != null)
 		{
 			nReq = server.NumRequested();
 		}
-		
+
     	callbackContext.success( nReq );
         return null;
     }
-    
+
 
 
     private PluginResult startCamera(JSONArray inputs, CallbackContext callbackContext) {
@@ -315,7 +315,7 @@ public class CameraServer extends CordovaPlugin {
          startCapture();
 
          callbackContext.success();
-         
+
          return null;
     }
 
@@ -326,30 +326,30 @@ public class CameraServer extends CordovaPlugin {
         stopCapture();
 
         callbackContext.success();
-        
+
         return null;
     }
 
     private PluginResult getJpegImage(JSONArray inputs, CallbackContext callbackContext) {
     	Log.w(LOGTAG, "getJpegImage");
-        
+
         byte[] bArray = CameraManager.lastFrame();
-        
+
         if (bArray != null)
         {
         	Log.w(LOGTAG, "Received " + String.valueOf(bArray.length) + " bytes...");
-        
+
         	String imageEncoded = Base64.encodeToString(bArray,Base64.NO_WRAP);
 
-        	//Log.e("LOOK", imageEncoded);       
+        	//Log.e("LOOK", imageEncoded);
 
         	callbackContext.success( imageEncoded );
         }
         else
         {
-        	callbackContext.error(0);        	
+        	callbackContext.error(0);
         }
-        
+
         return null;
     }
 
@@ -384,30 +384,30 @@ public class CameraServer extends CordovaPlugin {
 
         return null;
     }
-    
+
     private PluginResult setBrightness(JSONArray inputs, CallbackContext callbackContext) {
         Log.w(LOGTAG, "setBrightness");
-        
+
         JSONObject options = inputs.optJSONObject(0);
         if(options == null) return null;
-        
+
         brightness = options.optInt(OPT_BRIGHTNESS, 50);
-        
+
         final CallbackContext delayCallback = callbackContext;
         cordova.getActivity().runOnUiThread(new Runnable(){
 			@Override
             public void run() {
-				
+
 				Window w = cordova.getActivity().getWindow();
 		        WindowManager.LayoutParams lp = w.getAttributes();
 		        lp.screenBrightness = (float)brightness/100;
 		        if (lp.screenBrightness<.01f) lp.screenBrightness=.01f;
 		        w.setAttributes(lp);
-				
-		        delayCallback.success( "True" );				
+
+		        delayCallback.success( "True" );
             }
         });
-        
+
         return null;
     }
 
@@ -415,9 +415,9 @@ public class CameraServer extends CordovaPlugin {
     private PluginResult getTorch(JSONArray inputs, CallbackContext callbackContext) {
         Log.w(LOGTAG, "getTorch");
 
-        // TODO: IMPLEMENT        
+        // TODO: IMPLEMENT
         callbackContext.error(0);
-        
+
         return null;
     }
 
@@ -430,15 +430,15 @@ public class CameraServer extends CordovaPlugin {
         torchEnabled = options.optBoolean(OPT_ENABLED, false);
 
         CameraManager cMgr = CameraManager.get();
-        
+
         if (cMgr != null)
-        {        	
+        {
         	cMgr.setTorch(torchEnabled);
         	callbackContext.success( );
         }
         else
         {
-        	callbackContext.error(0);        
+        	callbackContext.error(0);
         }
 
         return null;
@@ -459,23 +459,23 @@ public class CameraServer extends CordovaPlugin {
 		} catch (IOException e) {
 			Log.w(LOGTAG, "Exception in openDriver");
 		}
-        
-        //CameraManager.get().startPreview();        
+
+        //CameraManager.get().startPreview();
 
         return true;
     }
-    
+
     private boolean stopCapture(){
         Log.w(LOGTAG, "stopCapture");
-                
-        CameraManager.get().stopPreview();                
-        
+
+        CameraManager.get().stopPreview();
+
         try {
 			CameraManager.get().closeDriver();
 		} catch (Exception e) {
 			Log.w(LOGTAG, "Exception in closeDriver");
 		}
-        
+
         return true;
     }
 
