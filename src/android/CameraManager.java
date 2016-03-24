@@ -32,6 +32,7 @@ public final class CameraManager {
 	private final Context context;
 	public final CameraConfigurationManager configManager;
 	public Camera camera;
+	public int cameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
 	private boolean initialized;
 	public boolean previewing;
 
@@ -95,14 +96,15 @@ public final class CameraManager {
 	public void openDriver() throws IOException {
 
 		if (camera == null) {
-			if (DEBUG) Log.i(TAG, "Camera opening...");
-			camera = Camera.open();
+			if (DEBUG) Log.i(TAG, "Opening front camera...");
+			camera = Camera.open(cameraId);
 			if (camera == null) {
-				if (DEBUG) Log.i(TAG, "First camera open failed");
-				camera = Camera.open(1);
+				if (DEBUG) Log.i(TAG, "Front camera open failed");
+				cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+				camera = Camera.open(cameraId);
 
 				if (camera == null){
-					if (DEBUG) Log.i(TAG, "Second camera open failed");
+					if (DEBUG) Log.i(TAG, "Back camera open failed");
 					throw new IOException();
 				}
 			}
@@ -112,7 +114,7 @@ public final class CameraManager {
 			camera.setPreviewDisplay(null);
 
 			if (android.os.Build.VERSION.SDK_INT >= 9) {
-				setCameraDisplayOrientation(0, camera);
+				setCameraDisplayOrientation(cameraId, camera);
 			}
 
 			if (surfaceTexture != null){
@@ -319,7 +321,7 @@ public final class CameraManager {
 			int targetRotation = 0;
 
 			if (android.os.Build.VERSION.SDK_INT >= 9) {
-				targetRotation = getDisplayOrientation(0);
+				targetRotation = getDisplayOrientation(cameraId);
 			}
 
 			previewCallback.setRotation(targetRotation);
