@@ -450,79 +450,79 @@ final class CameraConfigurationManager {
 		Log.d(TAG, "Setting preview size: " + cameraResolution);
 		parameters.setPreviewSize(cameraResolution.x, cameraResolution.y);
 
-		try {
-			String vs =  parameters.get("anti-shake");
-			if (vs != null) {
-				parameters.set("anti-shake", "1");
-			}
-		} catch (Exception e){
-		}
-
-		try {
-			String vs = parameters.get("preview-fps-range");
-			if (vs != null) {
-				Log.d(TAG, "Setting fps preview range");
-
-				parameters.set("preview-fps-range", "30000,30000");
-			}
-
-		} catch (Exception e){
-		}
-
-		try {
-			String vs = parameters.get("video-stabilization");
-			if (vs != null) {
-				parameters.set("video-stabilization", "true");
-			}
-		} catch (Exception e){
-		}
-
-		try {
-			String vs = parameters.get("video-stabilization-ocr");
-			if (vs != null) {
-				parameters.set("video-stabilization-ocr", "true");
-			}
-		} catch (Exception e){
-		}
-
-		try {
-			String vs = parameters.get("touch-af-aec-values");
-			if (vs != null) {
-				parameters.set("touch-af-aec-values", "touch-on");
-			}
-		} catch (Exception e){
-		}
-
-		try {
-			 String vs =  parameters.get("metering-areas");
-			 if (vs != null) {
-				   parameters.set("metering-areas", "(-200,-10,200,50,1)");
-			 }
-		} catch (Exception e){
-		}
-
-		try {
-			 String vs =  parameters.get("focus-areas");
-			 if (vs != null) {
-				   parameters.set("focus-areas", "(-200,-10,200,50,1)");
-			 }
-		} catch (Exception e){
-		}
-
-		//String focusMode = parameters.getFocusMode();
-
-		try{
-			parameters.setFocusMode(Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-			camera.setParameters(parameters);
-		} catch (Exception e){
-
-			try{
-				parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
-				camera.setParameters(parameters);
-			} catch (Exception e2){
-
-			}
-		}
+		// try {
+		// 	String vs =  parameters.get("anti-shake");
+		// 	if (vs != null) {
+		// 		parameters.set("anti-shake", "1");
+		// 	}
+		// } catch (Exception e){
+		// }
+		//
+		// try {
+		// 	String vs = parameters.get("preview-fps-range");
+		// 	if (vs != null) {
+		// 		Log.d(TAG, "Setting fps preview range");
+		//
+		// 		parameters.set("preview-fps-range", "30000,30000");
+		// 	}
+		//
+		// } catch (Exception e){
+		// }
+		//
+		// try {
+		// 	String vs = parameters.get("video-stabilization");
+		// 	if (vs != null) {
+		// 		parameters.set("video-stabilization", "true");
+		// 	}
+		// } catch (Exception e){
+		// }
+		//
+		// try {
+		// 	String vs = parameters.get("video-stabilization-ocr");
+		// 	if (vs != null) {
+		// 		parameters.set("video-stabilization-ocr", "true");
+		// 	}
+		// } catch (Exception e){
+		// }
+		//
+		// try {
+		// 	String vs = parameters.get("touch-af-aec-values");
+		// 	if (vs != null) {
+		// 		parameters.set("touch-af-aec-values", "touch-on");
+		// 	}
+		// } catch (Exception e){
+		// }
+		//
+		// try {
+		// 	 String vs =  parameters.get("metering-areas");
+		// 	 if (vs != null) {
+		// 		   parameters.set("metering-areas", "(-200,-10,200,50,1)");
+		// 	 }
+		// } catch (Exception e){
+		// }
+		//
+		// try {
+		// 	 String vs =  parameters.get("focus-areas");
+		// 	 if (vs != null) {
+		// 		   parameters.set("focus-areas", "(-200,-10,200,50,1)");
+		// 	 }
+		// } catch (Exception e){
+		// }
+		//
+		// //String focusMode = parameters.getFocusMode();
+		//
+		// try{
+		// 	parameters.setFocusMode(Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+		// 	camera.setParameters(parameters);
+		// } catch (Exception e){
+		//
+		// 	try{
+		// 		parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
+		// 		camera.setParameters(parameters);
+		// 	} catch (Exception e2){
+		//
+		// 	}
+		// }
 
 		Log.d(TAG, "Camera parameters flat: " + parameters.flatten());
 		camera.setParameters(parameters);
